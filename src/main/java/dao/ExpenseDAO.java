@@ -8,28 +8,28 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import beans.Post;
+import beans.Expense;
 
 /**
- * 部署データを扱うDAO
+ * 経費データを扱うDAO
  */
 public class ExpenseDAO {
 	/**
 	 * クエリ文字列
 	 */
-	private static final String SELECT_ALL_QUERY = "SELECT ID, NAME FROM POST ORDER BY ID";
-	private static final String SELECT_BY_ID_QUERY = "SELECT ID, NAME FROM POST WHERE ID = ?";
-	private static final String INSERT_QUERY = "INSERT INTO POST(NAME) VALUES (?)";
-	private static final String UPDATE_QUERY = "UPDATE POST SET NAME = ? WHERE ID = ?";
-	private static final String DELETE_QUERY = "DELETE FROM POST WHERE ID = ?";
+	private static final String SELECT_ALL_QUERY = "SELECT REQ_ID, REQ_DATE, NAME, TITLE, MONEY FROM EXPENSE ORDER BY REQ_ID";
+	private static final String SELECT_BY_ID_QUERY = "SELECT REQ_ID, REQ_DATE, NAME, TITLE, MONEY FROM EXPENSE WHERE ID = ?";
+	private static final String INSERT_QUERY = "INSERT INTO EXPENSE(NAME) VALUES (?)";
+	private static final String UPDATE_QUERY = "UPDATE EXPENSE SET NAME = ? WHERE ID = ?";
+	private static final String DELETE_QUERY = "DELETE FROM EXPENSE WHERE ID = ?";
 
 	/**
-	 * 部署の全件を取得する。
+	 * 経費の全件を取得する。
 	 *
-	 * @return DBに登録されている部署データ全件を収めたリスト。途中でエラーが発生した場合は空のリストを返す。
+	 * @return DBに登録されている経費データ全件を収めたリスト。途中でエラーが発生した場合は空のリストを返す。
 	 */
-	public List<Post> findAll() {
-		List<Post> result = new ArrayList<>();
+	public List<Expense> findAll() {
+		List<Expense> result = new ArrayList<>();
 
 		Connection connection = ConnectionProvider.getConnection();
 		if (connection == null) {
@@ -55,10 +55,10 @@ public class ExpenseDAO {
 	 * ID指定の検索を実施する。
 	 *
 	 * @param id 検索対象のID
-	 * @return 検索できた場合は検索結果データを収めたPostインスタンス。検索に失敗した場合はnullが返る。
+	 * @return 検索できた場合は検索結果データを収めたExpenseインスタンス。検索に失敗した場合はnullが返る。
 	 */
-	public Post findById(int id) {
-		Post result = null;
+	public Expense findById(int id) {
+		Expense result = null;
 
 		Connection connection = ConnectionProvider.getConnection();
 		if (connection == null) {
@@ -83,45 +83,45 @@ public class ExpenseDAO {
 	}
 
 	/**
-	 * 指定されたPostオブジェクトを新規にDBに登録する。
+	 * 指定されたExpenseオブジェクトを新規にDBに登録する。
 	 * 登録されたオブジェクトにはDB上のIDが上書きされる。
 	 * 何らかの理由で登録に失敗した場合、IDがセットされない状態（=0）で返却される。
 	 *
-	 * @param post 登録対象オブジェクト
+	 * @param expense 登録対象オブジェクト
 	 * @return DB上のIDがセットされたオブジェクト
 	 */
-	public Post create(Post post) {
+	public Expense create(Expense expense) {
 		Connection connection = ConnectionProvider.getConnection();
 		if (connection == null) {
-			return post;
+			return expense;
 		}
 
 		try (PreparedStatement statement = connection.prepareStatement(INSERT_QUERY, new String[] { "ID" });) {
 			// INSERT実行
-			statement.setString(1, post.getName());
+			statement.setString(1, expense.getName());
 			statement.executeUpdate();
 
 			// INSERTできたらKEYを取得
 			ResultSet rs = statement.getGeneratedKeys();
 			rs.next();
 			int id = rs.getInt(1);
-			post.setId(id);
+			expense.setId(id);
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		} finally {
 			ConnectionProvider.close(connection);
 		}
 
-		return post;
+		return expense;
 	}
 
 	/**
-	 * 指定されたPostオブジェクトを使ってDBを更新する。
+	 * 指定されたExpenseオブジェクトを使ってDBを更新する。
 	 *
-	 * @param post 更新対象オブジェクト
+	 * @param expense 更新対象オブジェクト
 	 * @return 更新に成功したらtrue、失敗したらfalse
 	 */
-	public boolean update(Post post) {
+	public boolean update(Expense expense) {
 		Connection connection = ConnectionProvider.getConnection();
 		if (connection == null) {
 			return false;
@@ -129,8 +129,8 @@ public class ExpenseDAO {
 
 		int count = 0;
 		try (PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
-			statement.setString(1, post.getName());
-			statement.setInt(2, post.getId());
+			statement.setString(1, expense.getName());
+			statement.setInt(2, expense.getId());
 			count = statement.executeUpdate();
 		} catch (SQLException ex) {
 			ex.printStackTrace();
@@ -142,9 +142,9 @@ public class ExpenseDAO {
 	}
 
 	/**
-	 * 指定されたIDのPostデータを削除する。
+	 * 指定されたIDのExpenseデータを削除する。
 	 *
-	 * @param id 削除対象のPostデータのID
+	 * @param id 削除対象のExpenseデータのID
 	 * @return 削除が成功したらtrue、失敗したらfalse
 	 */
 	public boolean remove(int id) {
@@ -169,13 +169,16 @@ public class ExpenseDAO {
 	/**
 	 * 検索結果行をオブジェクトとして構成する。
 	 * @param rs 検索結果が収められているResultSet
-	 * @return 検索結果行の各データを収めたPostインスタンス
+	 * @return 検索結果行の各データを収めたExpenseインスタンス
 	 * @throws SQLException ResultSetの処理中発生した例外
 	 */
-	private Post processRow(ResultSet rs) throws SQLException {
-		Post result = new Post();
-		result.setId(rs.getInt("ID"));
+	private Expense processRow(ResultSet rs) throws SQLException {
+		Expense result = new Expense();
+		result.setId(rs.getInt("REQ_ID"));
+		result.setDate(rs.getString("REQ_DATE"));
 		result.setName(rs.getString("NAME"));
+		result.setTitle(rs.getString("TITLE"));
+		result.setMoney(rs.getInt("MONEY"));
 		return result;
 	}
 }

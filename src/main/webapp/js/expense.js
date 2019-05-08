@@ -4,7 +4,7 @@ var rootUrl = "/java_s04/api/v1.1/expenses";
 
 findAll();
 
-/**$('#savePost').click(function() {
+$('#saveExpense').click(function() {
 	var name = $('#name').val();
 	if (name === '') {
 		$('.error').text('名前は必須入力です。');
@@ -13,13 +13,13 @@ findAll();
 		$('.error').text('');
 	}
 
-	var id = $('#postId').val()
+	var id = $('#expenseId').val()
 	if (id == '')
-		addPost();
+		addExpense();
 	else
-		updatePost(id);
+		updateExpense(id);
 	return false;
-})*/
+})
 
 $('#newExpense').click(function() {
 	renderDetails({});
@@ -48,8 +48,8 @@ function findById(id) {
 	});
 }
 
-function addPost() {
-	console.log('addPost start');
+function addExpense() {
+	console.log('addExpense start');
 	$.ajax({
 		type: "POST",
 		contentType: "application/json",
@@ -57,18 +57,18 @@ function addPost() {
 		dataType: "json",
 		data: formToJSON(),
 		success: function(data, textStatus, jqXHR) {
-			alert('部署データの追加に成功しました');
-			$('#postId').val(data.id);
+			alert('経費データの追加に成功しました');
+			$('#expenseId').val(data.id);
 			findAll();
 		},
 		error: function(jqXHR, textStatus, errorThrown){
-			alert('部署データの追加に失敗しました');
+			alert('経費データの追加に失敗しました');
 		}
 	})
 }
 
-function updatePost(id) {
-	console.log('updatePost start');
+function updateExpense(id) {
+	console.log('updateExpense start');
 	$.ajax({
 		type: "PUT",
 		contentType: "application/json",
@@ -76,11 +76,11 @@ function updatePost(id) {
 		dataType: "json",
 		data: formToJSON(),
 		success: function(data, textStatus, jqXHR) {
-			alert('部署データの更新に成功しました');
+			alert('経費データの更新に成功しました');
 			findAll();
 		},
 		error: function(jqXHR, textStatus, errorThrown){
-			alert('部署データの更新に失敗しました');
+			alert('経費データの更新に失敗しました');
 		}
 	})
 }
@@ -93,50 +93,62 @@ function deleteById(id) {
 		url: rootUrl+'/'+id,
 		success: function() {
 			findAll();
-			$('#postId').val('');
+			$('#expenseId').val('');
+			$('#date').val('');
 			$('#name').val('');
+			$('#title').val('');
+			$('#money').val('');
 		}
 	});
 }
 
 function renderTable(data) {
-	var headerRow = '<tr><th>ID</th><th>経費名</th></tr>';
+	var headerRow = '<tr><th>ID</th><th>申請日</th><th>申請者</th><th>タイトル</th><th>金額</th></tr>';
 
-	$('#posts').children().remove();
+	$('#expenses').children().remove();
 
 	if (data.length === 0) {
-		$('#posts').append('<p>現在データが存在していません。</p>')
+		$('#expenses').append('<p>現在データが存在していません。</p>')
 	} else {
 		var table = $('<table>').attr('border', 1);
 		table.append(headerRow);
-		$.each(data, function(index, post) {
+		$.each(data, function(index, expense) {
 			var row = $('<tr>');
-			row.append($('<td>').text(post.id));
-			row.append($('<td>').text(post.name));
+			row.append($('<td>').text(expense.id));
+			row.append($('<td>').text(expense.date));
+			row.append($('<td>').text(expense.name));
+			row.append($('<td>').text(expense.title));
+			row.append($('<td>').text(expense.money));
 			row.append($('<td>').append(
-					$('<button>').text("編集").attr("type","button").attr("onclick", "findById("+post.id+')')
+					$('<button>').text("編集").attr("type","button").attr("onclick", "findById("+expense.id+')')
 				));
 			row.append($('<td>').append(
-					$('<button>').text("削除").attr("type","button").attr("onclick", "deleteById("+post.id+')')
+					$('<button>').text("削除").attr("type","button").attr("onclick", "deleteById("+expense.id+')')
 				));
 			table.append(row);
 		});
 
-		$('#posts').append(table);
+		$('#expenses').append(table);
 	}
 
 }
 
-function renderDetails(post) {
+function renderDetails(expense) {
 	$('.error').text('');
-	$('#postId').val(post.id);
-	$('#name').val(post.name);
+	$('#expenseId').val(expense.id);
+	$('#date').val(expense.date);
+	$('#name').val(expense.name);
+	$('#title').val(expense.title);
+	$('#money').val(expense.money);
 }
 
 function formToJSON() {
-	var postId = $('#postId').val();
+	var expenseId = $('#expenseId').val();
 	return JSON.stringify({
-		"id": (postId == "" ? 0 : postId),
-		"name": $('#name').val()
+		"id": (expenseId == "" ? 0 : expenseId),
+		"date": $('#date').val(),
+		"name": $('#name').val(),
+		"title": $('#title').val(),
+		"money": $('#money').val()
 	});
 }

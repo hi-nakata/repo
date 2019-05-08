@@ -14,36 +14,36 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import beans.Post;
-import dao.PostDAO;
+import beans.Expense;
+import dao.ExpenseDAO;
 
 /**
- * 部署関連のサービス実装。
+ * 経費関連のサービス実装。
  */
 @Path("expenses")
 public class ExpenseResource {
-	private final PostDAO dao = new PostDAO();
+	private final ExpenseDAO dao = new ExpenseDAO();
 
 	/**
-	 * 一覧用に部署情報を全件取得する。
-	 * @return 部署情報のリストをJSON形式で返す。
+	 * 一覧用に経費情報を全件取得する。
+	 * @return 経費情報のリストをJSON形式で返す。
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Post> findAll() {
+	public List<Expense> findAll() {
 		return dao.findAll();
 	}
 
 	/**
-	 * ID指定で部署情報を取得する。
+	 * ID指定で経費情報を取得する。
 	 *
-	 * @param id 取得対象の部署のID
-	 * @return 取得した部署情報をJSON形式で返す。
+	 * @param id 取得対象の経費のID
+	 * @return 取得した経費情報をJSON形式で返す。
 	 */
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Post findById(@PathParam("id") int id) {
+	public Expense findById(@PathParam("id") int id) {
 		return dao.findById(id);
 	}
 
@@ -58,23 +58,23 @@ public class ExpenseResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Post create(Post post) throws WebApplicationException {
-		validate(post);
-		return dao.create(post);
+	public Expense create(Expense expense) throws WebApplicationException {
+		validate(expense);
+		return dao.create(expense);
 	}
 
 	/**
 	 * 指定した情報でDBを更新する。
 	 *
-	 * @param post 更新情報を含めた部署情報
+	 * @param expense 更新情報を含めた部署情報
 	 * @throws WebApplicationException 入力データチェックに失敗した場合に送出される。
 	 */
 	@PUT
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public void update(Post post) throws WebApplicationException {
-		validate(post);
-		dao.update(post);
+	public void update(Expense expense) throws WebApplicationException {
+		validate(expense);
+		dao.update(expense);
 	}
 
 	/**
@@ -93,8 +93,8 @@ public class ExpenseResource {
 	 * @param post 入力データを保持したモデル
 	 * @throws ValidationException 入力データチェックに失敗した場合に送出される。
 	 */
-	private void validate(Post post) throws WebApplicationException {
-		if (post.getName().isEmpty()) {
+	private void validate(Expense expense) throws WebApplicationException {
+		if (expense.getName().isEmpty()) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 	}

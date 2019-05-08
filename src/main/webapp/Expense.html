@@ -1,26 +1,55 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="Pragma" content="no-cache" />
-<meta http-equiv="cache-control" content="no-cache" />
-<meta http-equiv="expires" content="0" />
-<title>社員管理ページ</title>
-<!-- <link rel="stylesheet" href="css/employeeStyle.css">-->
-</head>
-<body>
-	<div class="main clearfix">
-		<div id="list">
-			<p>経費一覧</p>
-			<div id="expenses"></div>
-			<div id="insertBlock">
-				<button type="button" id="newExpense">経費登録</button>
+	<head>
+		<meta charset="UTF-8">
+		<title>部署データベース管理ページ</title>
+		<link rel="stylesheet" href="css/postStyle.css">
+	</head>
+	<body>
+		<div class="main clearfix">
+			<div id="list">
+				<p>経費一覧:</p>
+				<div id="expenses"></div>
+				<div id="insertBlock">
+					<button type="button" id="newExpense">経費追加</button>
+				</div>
+			</div>
+			<div id="detail">
+				<p>経費詳細データ：</p>
+    			<form id="expenseForm">
+    				<div class="error"></div>
+    				<div>
+			            <label for="name">申請ID:</label>
+    	    		    <input type="text" id="expenseId" disabled>
+        		    </div>
+
+					<div>
+			            <label for="name">日付:</label>
+    	    		    <input type="text" id="date" required>
+    	    		</div>
+
+    	    		<div>
+			            <label for="name">名前:</label>
+    	    		    <input type="text" maxlength="40" id="name" required>
+    	    		</div>
+
+    	    		<div>
+			            <label for="name">タイトル:</label>
+    	    		    <input type="text" maxlength="40" id="title" required>
+    	    		</div>
+
+    	    		<div>
+			            <label for="name">金額:</label>
+    	    		    <input type="text" maxlength="40" id="money" required>
+    	    		</div>
+
+        			<button id="saveExpense">保存</button>
+			    </form>
 			</div>
 		</div>
-	</div>
 
-	<script src="js/jquery-3.3.1.min.js"></script>
-	<script src="js/expense.js"></script>
+		<script src="js/jquery-3.3.1.min.js"></script>
+		<script src="js/expense.js"></script>
 
-</body>
+	</body>
 </html>
