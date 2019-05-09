@@ -18,10 +18,10 @@ public class ExpenseDAO {
 	 * クエリ文字列
 	 */
 	private static final String SELECT_ALL_QUERY = "SELECT REQ_ID, REQ_DATE, NAME, TITLE, MONEY FROM EXPENSE ORDER BY REQ_ID";
-	private static final String SELECT_BY_ID_QUERY = "SELECT REQ_ID, REQ_DATE, NAME, TITLE, MONEY FROM EXPENSE WHERE ID = ?";
-	private static final String INSERT_QUERY = "INSERT INTO EXPENSE(NAME) VALUES (?)";
-	private static final String UPDATE_QUERY = "UPDATE EXPENSE SET NAME = ? WHERE ID = ?";
-	private static final String DELETE_QUERY = "DELETE FROM EXPENSE WHERE ID = ?";
+	private static final String SELECT_BY_ID_QUERY = "SELECT REQ_ID, REQ_DATE, NAME, TITLE, MONEY FROM EXPENSE WHERE REQ_ID = ?";
+	private static final String INSERT_QUERY = "INSERT INTO EXPENSE(REQ_DATE, NAME, TITLE, MONEY) VALUES (?,?,?,?)";
+	private static final String UPDATE_QUERY = "UPDATE EXPENSE SET REQ_DATE = ?,NAME = ?,TITLE = ?,MONEY = ? WHERE REQ_ID = ?";
+	private static final String DELETE_QUERY = "DELETE FROM EXPENSE WHERE REQ_ID = ?";
 
 	/**
 	 * 経費の全件を取得する。
@@ -96,9 +96,12 @@ public class ExpenseDAO {
 			return expense;
 		}
 
-		try (PreparedStatement statement = connection.prepareStatement(INSERT_QUERY, new String[] { "ID" });) {
+		try (PreparedStatement statement = connection.prepareStatement(INSERT_QUERY, new String[] { "REQ_ID" });) {
 			// INSERT実行
-			statement.setString(1, expense.getName());
+			statement.setString(1, expense.getDate());
+			statement.setString(2, expense.getName());
+			statement.setString(3, expense.getTitle());
+			statement.setInt(4, expense.getMoney());
 			statement.executeUpdate();
 
 			// INSERTできたらKEYを取得
@@ -129,8 +132,11 @@ public class ExpenseDAO {
 
 		int count = 0;
 		try (PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
-			statement.setString(1, expense.getName());
-			statement.setInt(2, expense.getId());
+			statement.setString(1, expense.getDate());
+			statement.setString(2, expense.getName());
+			statement.setString(3, expense.getTitle());
+			statement.setInt(4, expense.getMoney());
+			statement.setInt(5, expense.getId());
 			count = statement.executeUpdate();
 		} catch (SQLException ex) {
 			ex.printStackTrace();

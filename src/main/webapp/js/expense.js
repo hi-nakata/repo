@@ -98,6 +98,9 @@ function deleteById(id) {
 			$('#name').val('');
 			$('#title').val('');
 			$('#money').val('');
+		},
+		error:function(XMLHttpRequest,textStatus, errorThrown){
+			alert('データの通信に失敗');
 		}
 	});
 }
